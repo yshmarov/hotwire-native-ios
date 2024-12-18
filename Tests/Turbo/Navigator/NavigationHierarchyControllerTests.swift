@@ -322,6 +322,66 @@ final class NavigationHierarchyControllerTests: XCTestCase {
         /// No assertions needed. App will crash if we pass a non-http or non-https scheme to SFSafariViewController.
     }
 
+    func test_modalStyle_isCorrectlySet() throws {
+        let proposal = VisitProposal(
+            path: "/new",
+            context: .modal,
+            additionalProperties: [
+                "modal_style": "form_sheet"
+            ])
+        navigator.route(proposal)
+        XCTAssertEqual(modalNavigationController.modalPresentationStyle, .formSheet)
+    }
+
+    func test_noModalStyle_defaultsToAutomatic() throws {
+        let proposal = VisitProposal(
+            path: "/new",
+            context: .modal
+        )
+        navigator.route(proposal)
+        // For most view controllers, UIKit maps [automatic] to:
+        // UIModalPresentationStyle.formSheet in iOS 18 and later
+        // UIModalPresentationStyle.pageSheet in versions of iOS earlier than iOS 18
+        // Some system view controllers may map it to a different style.
+        // https://developer.apple.com/documentation/uikit/uimodalpresentationstyle/automatic
+        if #available(iOS 18, *) {
+            XCTAssertEqual(modalNavigationController.modalPresentationStyle, .formSheet)
+        } else {
+            XCTAssertEqual(modalNavigationController.modalPresentationStyle, .pageSheet)
+        }
+    }
+
+    func test_modalDismissGestureEnabled_isCorrectlySet() throws {
+        let proposal = VisitProposal(
+            path: "/new",
+            context: .modal,
+            additionalProperties: [
+                "modal_dismiss_gesture_enabled": true
+            ])
+        navigator.route(proposal)
+        XCTAssertEqual(modalNavigationController.visibleViewController?.isModalInPresentation, false)
+    }
+
+    func test_modalDismissGestureDisabled_isCorrectlySet() throws {
+        let proposal = VisitProposal(
+            path: "/new",
+            context: .modal,
+            additionalProperties: [
+                "modal_dismiss_gesture_enabled": false
+            ])
+        navigator.route(proposal)
+        XCTAssertEqual(modalNavigationController.visibleViewController?.isModalInPresentation, true)
+    }
+
+    func test_modalDismissGestureEnabled_missing_defaultsToTrue() throws {
+        let proposal = VisitProposal(
+            path: "/new",
+            context: .modal
+        )
+        navigator.route(proposal)
+        XCTAssertEqual(modalNavigationController.visibleViewController?.isModalInPresentation, false)
+    }
+
     // MARK: Private
 
     private enum Context {
@@ -370,13 +430,19 @@ private class EmptyNavigationDelegate: NavigationHierarchyControllerDelegate {
 // MARK: - VisitProposal extension
 
 private extension VisitProposal {
-    init(path: String = "", action: VisitAction = .advance, context: Navigation.Context = .default, presentation: Navigation.Presentation = .default) {
+    init(path: String = "",
+         action: VisitAction = .advance,
+         context: Navigation.Context = .default,
+         presentation: Navigation.Presentation = .default,
+         additionalProperties: [String: AnyHashable] = [:]) {
         let url = URL(string: "https://example.com")!.appendingPathComponent(path)
         let options = VisitOptions(action: action, response: nil)
-        let properties: PathProperties = [
+        let defaultProperties: PathProperties = [
             "context": context.rawValue,
             "presentation": presentation.rawValue
         ]
+        let properties = defaultProperties.merging(additionalProperties) { (current, _) in current }
+
         self.init(url: url, options: options, properties: properties)
     }
 }

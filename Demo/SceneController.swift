@@ -13,42 +13,12 @@ final class SceneController: UIResponder {
     }()
     private lazy var tabBarController = TabBarController(navigators: navigators)
 
-    // MARK: - Setup
-
-    private func configureBridge() {
-        Hotwire.registerBridgeComponents([
-            FormComponent.self,
-            MenuComponent.self,
-            OverflowMenuComponent.self,
-            ButtonComponent.self,
-            NavComponent.self,
-            ReviewPromptComponent.self
-        ])
-    }
-
-    private func configureRootViewController() {
-        guard let window = window else {
-            fatalError()
-        }
-        // window.rootViewController = navigator.rootViewController
-        UITabBar.configureWithOpaqueBackground()
-        UINavigationBar.configureWithOpaqueBackground()
-        window.rootViewController = tabBarController
-    }
-
     // MARK: - Authentication
 
     private func promptForAuthentication() {
         let authURL = rootURL.appendingPathComponent("/signin")
         navigator.route(authURL)
     }
-
-    // MARK: - Path Configuration
-
-    private lazy var pathConfiguration = PathConfiguration(sources: [
-        .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")!),
-        .server(rootURL.appending(path: "hotwire_native/v1/ios/path_configuration.json"))
-    ])
 }
 
 extension SceneController: UIWindowSceneDelegate {
@@ -56,24 +26,13 @@ extension SceneController: UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         window = UIWindow(windowScene: windowScene)
+        window?.rootViewController = navigator.rootViewController
         window?.makeKeyAndVisible()
-
-        configureBridge()
-
-        Hotwire.config.makeCustomWebView = { configuration in
-            let webView = WKWebView(frame: .zero, configuration: configuration)
-            webView.allowsLinkPreview = false
-            Bridge.initialize(webView)
-            return webView
-        }
-
-        configureRootViewController()
 
         // navigator.route(rootURL)
         navigators[0].route(rootURL)
         navigators[1].route(rootURL.appendingPathComponent("hotwire_native/tab1"))
         navigators[2].route(rootURL.appendingPathComponent("hotwire_native/tab2"))
-
     }
 }
 
