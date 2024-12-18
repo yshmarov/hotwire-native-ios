@@ -71,8 +71,8 @@ extension SceneController: UIWindowSceneDelegate {
 
         // navigator.route(rootURL)
         navigators[0].route(rootURL)
-        navigators[1].route(rootURL.appendingPathComponent("posts"))
-        navigators[2].route(rootURL.appendingPathComponent("playlists"))
+        navigators[1].route(rootURL.appendingPathComponent("hotwire_native/tab1"))
+        navigators[2].route(rootURL.appendingPathComponent("hotwire_native/tab2"))
 
     }
 }
@@ -119,8 +119,8 @@ class TabBarController: UITabBarController {
         
         // Customize tab bar items
         viewControllers?[0].tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
-        viewControllers?[1].tabBarItem = UITabBarItem(title: "Posts", image: UIImage(systemName: "play.circle"), tag: 1)
-        viewControllers?[2].tabBarItem = UITabBarItem(title: "Playlists", image: UIImage(systemName: "list.number"), tag: 2)
+        viewControllers?[1].tabBarItem = UITabBarItem(title: "Tab1", image: UIImage(systemName: "play.circle"), tag: 1)
+        viewControllers?[2].tabBarItem = UITabBarItem(title: "Tab2", image: UIImage(systemName: "list.number"), tag: 2)
     }
     
     required init?(coder: NSCoder) {
