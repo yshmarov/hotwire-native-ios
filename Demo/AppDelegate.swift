@@ -17,7 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func configureHotwire() {
         // Load the path configuration
         Hotwire.loadPathConfiguration(from: [
-            .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")!)
+            .file(Bundle.main.url(forResource: "path-configuration", withExtension: "json")!),
+            .server(Demo.current.appending(path: "hotwire_native/v1/ios/path_configuration.json"))
         ])
 
         // Set an optional custom user agent application prefix.
@@ -28,6 +29,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             FormComponent.self,
             MenuComponent.self,
             OverflowMenuComponent.self,
+            ButtonComponent.self,
+            NavComponent.self,
+            ReviewPromptComponent.self
         ])
 
         // Set configuration options
