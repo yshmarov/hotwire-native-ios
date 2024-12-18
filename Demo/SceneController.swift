@@ -26,6 +26,8 @@ extension SceneController: UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         window = UIWindow(windowScene: windowScene)
+        UITabBar.configureWithOpaqueBackground()
+        UINavigationBar.configureWithOpaqueBackground()
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
 
