@@ -7,11 +7,7 @@ final class SceneController: UIResponder {
     var window: UIWindow?
 
     private let rootURL = Demo.current
-    private lazy var navigator = Navigator(pathConfiguration: pathConfiguration, delegate: self)
-    private lazy var navigators: [Navigator] = {
-        (0..<3).map { _ in Navigator(pathConfiguration: pathConfiguration, delegate: self) }
-    }()
-    private lazy var tabBarController = TabBarController(navigators: navigators)
+    private lazy var navigator = Navigator(delegate: self)
 
     // MARK: - Authentication
 
@@ -29,10 +25,7 @@ extension SceneController: UIWindowSceneDelegate {
         window?.rootViewController = navigator.rootViewController
         window?.makeKeyAndVisible()
 
-        // navigator.route(rootURL)
-        navigators[0].route(rootURL)
-        navigators[1].route(rootURL.appendingPathComponent("hotwire_native/tab1"))
-        navigators[2].route(rootURL.appendingPathComponent("hotwire_native/tab2"))
+        navigator.route(rootURL)
     }
 }
 
@@ -64,25 +57,5 @@ extension SceneController: NavigatorDelegate {
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             navigator.rootViewController.present(alert, animated: true)
         }
-    }
-}
-
-class TabBarController: UITabBarController {
-    private let navigators: [Navigator]
-    
-    init(navigators: [Navigator]) {
-        self.navigators = navigators
-        super.init(nibName: nil, bundle: nil)
-        
-        viewControllers = navigators.map { $0.rootViewController }
-        
-        // Customize tab bar items
-        viewControllers?[0].tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
-        viewControllers?[1].tabBarItem = UITabBarItem(title: "Tab1", image: UIImage(systemName: "play.circle"), tag: 1)
-        viewControllers?[2].tabBarItem = UITabBarItem(title: "Tab2", image: UIImage(systemName: "list.number"), tag: 2)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
