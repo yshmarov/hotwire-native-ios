@@ -1,9 +1,18 @@
 import HotwireNative
+import WebKit
 import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Configure Hotwire WebView
+        Hotwire.config.makeCustomWebView = { configuration in
+            let webView = WKWebView(frame: .zero, configuration: configuration)
+            webView.allowsLinkPreview = false
+            Bridge.initialize(webView)
+            return webView
+        }
+        
         configureHotwire()
         return true
     }
