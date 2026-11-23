@@ -36,7 +36,16 @@ final class WebViewBridge {
     let webView: WKWebView
 
     deinit {
-        webView.configuration.userContentController.removeScriptMessageHandler(forName: messageHandlerName)
+        let removeHandler = { [webView, messageHandlerName] in
+            webView.configuration.userContentController.removeScriptMessageHandler(forName: messageHandlerName)
+        }
+
+        if Thread.isMainThread {
+            removeHandler()
+        } else {
+            // Keep the web view alive until its handler is removed on the main queue.
+            DispatchQueue.main.async(execute: removeHandler)
+        }
     }
 
     init(webView: WKWebView) {
